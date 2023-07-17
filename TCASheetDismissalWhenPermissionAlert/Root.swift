@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  Root.swift
 //  TCASheetDismissalWhenPermissionAlert
 //
 //  Created by Tobias Kreß on 17.07.23.
@@ -60,48 +60,10 @@ struct Root: Reducer {
   }
 }
 
-struct Feature: Reducer {
-  struct State: Equatable {
-    let identifier: String
-
-    init(identifier: String) {
-      self.identifier = identifier
-    }
-  }
-
-  enum Action: Equatable {
-    case didTapButton
-  }
-
-  public var body: some Reducer<State, Action> {
-    Reduce { state, action in
-      return .none
-    }
-  }
-}
-
-struct FeatureView: View {
-  let store: StoreOf<Feature>
-
-  init(store: StoreOf<Feature>) {
-    self.store = store
-  }
-
-  var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack {
-        Text("Feature \(viewStore.identifier)")
-        Button {
-          store.send(.didTapButton)
-        } label: {
-          Text("Open Feature 2")
-        }
-      }
-    }
-  }
-}
-
 struct RootView: View {
+  // This line causes the Feature2 sheet to dismiss and show up again immediately
+  // when the scenePhase changes - but ONLY on iOS 15 (and maybe below, not able to test on a device)
+  // Remove this and it also works as expected when running on iOS 15
   @Environment(\.scenePhase) var scenePhase
 
   let store: StoreOf<Root>
@@ -111,14 +73,12 @@ struct RootView: View {
   }
 
   var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack {
-        Text("Root")
-        Button {
-          viewStore.send(.didTapFeature1Button)
-        } label: {
-          Text("Open Feature 1")
-        }
+    VStack {
+      Text("Root")
+      Button {
+        store.send(.didTapFeature1Button)
+      } label: {
+        Text("Show Feature 1")
       }
     }
     .sheet(
